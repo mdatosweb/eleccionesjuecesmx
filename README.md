@@ -1,2 +1,2 @@
 # eleccionesjuecesmx
-Información acerca de candidatos a Elecciones Jueves en México
+Información acerca de candidatos a Elecciones a Jueces y Magistrados en México 
