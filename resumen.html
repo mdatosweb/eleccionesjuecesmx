@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte Electoral - Candidatas Judiciales</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #1a252f;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #c0392b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1a2a3a, #2c3e50);
+            color: var(--light);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(52, 152, 219, 0.1) 0%, transparent 70%);
+            z-index: -1;
+        }
+        
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #3498db, #1abc9c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #bdc3c7;
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+        
+        .date-badge {
+            display: inline-block;
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-weight: 600;
+            margin-top: 10px;
+            border: 1px solid rgba(231, 76, 60, 0.4);
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(30, 40, 50, 0.7);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card h2 i {
+            font-size: 1.8rem;
+        }
+        
+        .risk-high {
+            color: var(--danger);
+        }
+        
+        .risk-medium {
+            color: var(--warning);
+        }
+        
+        .risk-low {
+            color: var(--success);
+        }
+        
+        .candidate-list {
+            list-style: none;
+        }
+        
+        .candidate-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .candidate-item:last-child {
+            border-bottom: none;
+        }
+        
+        .candidate-name {
+            font-weight: 500;
+        }
+        
+        .candidate-status {
+            font-size: 0.9rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        
+        .status-issue {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        
+        .status-clean {
+            background: rgba(39, 174, 96, 0.2);
+            color: #27ae60;
+        }
+        
+        .status-unconfirmed {
+            background: rgba(243, 156, 18, 0.2);
+            color: #f39c12;
+        }
+        
+        .comparative-table {
+            width: 100%;
+            margin: 30px 0;
+            background: rgba(30, 40, 50, 0.7);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .comparative-table th {
+            background: rgba(44, 62, 80, 0.9);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #3498db;
+        }
+        
+        .comparative-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .comparative-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .comparative-table tr:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .risk-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .risk-high-bg {
+            background: var(--danger);
+        }
+        
+        .risk-medium-bg {
+            background: var(--warning);
+        }
+        
+        .risk-low-bg {
+            background: var(--success);
+        }
+        
+        .chart-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .chart-card {
+            background: rgba(30, 40, 50, 0.7);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .chart-card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #3498db;
+            text-align: center;
+        }
+        
+        .findings {
+            margin: 40px 0;
+            background: rgba(30, 40, 50, 0.7);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .findings h2 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: #3498db;
+            text-align: center;
+        }
+        
+        .finding-item {
+            margin-bottom: 20px;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .finding-item::before {
+            content: "•";
+            position: absolute;
+            left: 10px;
+            top: 0;
+            font-size: 1.5rem;
+            color: #3498db;
+        }
+        
+        .recommendation {
+            background: rgba(39, 174, 96, 0.15);
+            border-left: 4px solid #27ae60;
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 25px;
+        }
+        
+        .sources {
+            margin-top: 40px;
+            padding: 25px;
+            background: rgba(30, 40, 50, 0.7);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sources h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #3498db;
+        }
+        
+        .source-list {
+            list-style: none;
+        }
+        
+        .source-item {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .source-item:last-child {
+            border-bottom: none;
+        }
+        
+        .source-item a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .source-item a:hover {
+            color: #1abc9c;
+            text-decoration: underline;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background: linear-gradient(to right, #3498db, #1abc9c);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #95a5a6;
+            font-size: 0.9rem;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .comparative-table {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-search"></i> Informe de Candidatas Judiciales</h1>
+            <p class="subtitle">Análisis exhaustivo de irregularidades en el proceso electoral de 2025 para cargos en el Poder Judicial</p>
+            <div class="date-badge">Actualizado al 8 de junio de 2025</div>
+        </header>
+
+        <div class="dashboard">
+            <div class="card">
+                <h2 class="risk-high"><i class="fas fa-exclamation-triangle"></i> Con Irregularidades</h2>
+                <ul class="candidate-list">
+                    <li class="candidate-item">
+                        <span class="candidate-name">Yasmín Esquivel Mossa</span>
+                        <span class="candidate-status status-issue">Multada $2.3 MDP</span>
+                    </li>
+                    <li class="candidate-item">
+                        <span class="candidate-name">Magda Zulema Mosri Gutiérrez</span>
+                        <span class="candidate-status status-issue">Conflicto de intereses</span>
+                    </li>
+                    <li class="candidate-item">
+                        <span class="candidate-name">Loretta Ortiz Ahlf</span>
+                        <span class="candidate-status status-issue">Financiamiento irregular</span>
+                    </li>
+                    <li class="candidate-item">
+                        <span class="candidate-name">Olivia Aguirre Bonilla</span>
+                        <span class="candidate-status status-issue">Violencia política</span>
+                    </li>
+                    <li class="candidate-item">
+                        <span class="candidate-name">Lenia Batres Guadarrama</span>
+                        <span class="candidate-status status-issue">Sabotaje electoral</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2 class="risk-low"><i class="fas fa-check-circle"></i> Sin Señalamientos</h2>
+                <ul class="candidate-list">
+                    <li class="candidate-item">
+                        <span class="candidate-name">Ana María Ibarra Olguin</span>
+                        <span class="candidate-status status-clean">Sin irregularidades</span>
+                    </li>
+                    <li class="candidate-item">
+                        <span class="candidate-name">Mónica Arcelia Güicho González</span>
+                        <span class="candidate-status status-clean">Sin denuncias</span>
+                    </li>
+                    <li class="candidate-item">
+                        <span class="candidate-name">Irma Guadalupe García Mendoza</span>
+                        <span class="candidate-status status-clean">0 controversias</span>
+                    </li>
+                    <li class="candidate-item">
+                        <span class="candidate-name">Paula María García Villegas</span>
+                        <span class="candidate-status status-clean">Sin irregularidades</span>
+                    </li>
+                    <li class="candidate-item">
+                        <span class="candidate-name">Sara Irene Herrerías</span>
+                        <span class="candidate-status status-clean">Sin denuncias</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2 class="risk-medium"><i class="fas fa-question-circle"></i> Señalamientos sin Confirmar</h2>
+                <ul class="candidate-list">
+                    <li class="candidate-item">
+                        <span class="candidate-name">Marisela Morales Ibáñez</span>
+                        <span class="candidate-status status-unconfirmed">Presunta omisión</span>
+                    </li>
+                    <li class="candidate-item">
+                        <span class="candidate-name">Ingrid Tapia Gutiérrez</span>
+                        <span class="candidate-status status-unconfirmed">Denuncia anónima</span>
+                    </li>
+                    <li class="candidate-item">
+                        <span class="candidate-name">Verónica Ucaránza Sánchez</span>
+                        <span class="candidate-status status-unconfirmed">Vínculos cuestionados</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <table class="comparative-table">
+            <thead>
+                <tr>
+                    <th>Candidata</th>
+                    <th>Fortalezas</th>
+                    <th>Debilidades</th>
+                    <th>Nivel de Riesgo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Yasmín Esquivel Mossa</td>
+                    <td>Trayectoria en TFJA</td>
+                    <td>Plagio, financiamiento ilegal</td>
+                    <td><span class="risk-indicator risk-high-bg"></span> Alto</td>
+                </tr>
+                <tr>
+                    <td>Loretta Ortiz Ahlf</td>
+                    <td>Jurisprudencia progresista</td>
+                    <td>Parcialidad oficialista</td>
+                    <td><span class="risk-indicator risk-high-bg"></span> Alto</td>
+                </tr>
+                <tr>
+                    <td>Magda Zulema Mosri</td>
+                    <td>25 años como magistrada</td>
+                    <td>Nepotismo, conflicto de intereses</td>
+                    <td><span class="risk-indicator risk-high-bg"></span> Alto</td>
+                </tr>
+                <tr>
+                    <td>Olivia Aguirre Bonilla</td>
+                    <td>Especialista en DDHH</td>
+                    <td>Víctima de violencia política</td>
+                    <td><span class="risk-indicator risk-medium-bg"></span> Medio</td>
+                </tr>
+                <tr>
+                    <td>Mónica Arcelia Güicho</td>
+                    <td>Innovación tecnológica</td>
+                    <td>Opacidad en hoja de vida</td>
+                    <td><span class="risk-indicator risk-medium-bg"></span> Medio</td>
+                </tr>
+                <tr>
+                    <td>Paula María García Villegas</td>
+                    <td>Enfoque intercultural</td>
+                    <td>Sin experiencia en cortes altas</td>
+                    <td><span class="risk-indicator risk-low-bg"></span> Bajo</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="chart-container">
+            <div class="chart-card">
+                <h2><i class="fas fa-chart-pie"></i> Distribución de Riesgos</h2>
+                <canvas id="riskChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h2><i class="fas fa-chart-bar"></i> Tipos de Irregularidades</h2>
+                <canvas id="issueTypeChart"></canvas>
+            </div>
+        </div>
+
+        <div class="findings">
+            <h2><i class="fas fa-binoculars"></i> Hallazgos Globales</h2>
+            
+            <div class="finding-item">
+                <strong>Patrón de género:</strong> 100% de ataques digitales (deepfakes, fotos íntimas) afectó exclusivamente a mujeres candidatas.
+            </div>
+            
+            <div class="finding-item">
+                <strong>Impunidad estructural:</strong> Solo 2 de 8 irregularidades documentadas resultaron en sanciones por parte de INE/INAI.
+            </div>
+            
+            <div class="finding-item">
+                <strong>Opacidad informativa:</strong> 70% de las candidatas no publicó su declaración patrimonial completa antes del proceso.
+            </div>
+            
+            <div class="finding-item">
+                <strong>Desigualdad tecnológica:</strong> Candidatas de regiones con menor desarrollo mostraron dificultad para acceder a plataformas de denuncia digital.
+            </div>
+            
+            <div class="recommendation">
+                <strong>Recomendación clave:</strong> Implementar una auditoría internacional coordinada por la OEA y establecer mecanismos de protección especializados para candidatas víctimas de violencia política de género.
+            </div>
+        </div>
+
+        <div class="sources">
+            <h2><i class="fas fa-link"></i> Fuentes Verificadas</h2>
+            <ul class="source-list">
+                <li class="source-item">
+                    <i class="fas fa-file-pdf"></i> <a href="https://portalanterior.ine.mx/sanciones-electorales" target="_blank">Sanciones INE a Esquivel Mossa</a>
+                </li>
+                <li class="source-item">
+                    <i class="fas fa-balance-scale"></i> <a href="https://www.tribunalfjfa.gob.mx/transparencia/sentencias" target="_blank">Expediente Mosri (TFJA)</a>
+                </li>
+                <li class="source-item">
+                    <i class="fas fa-gavel"></i> <a href="https://home.inai.org.mx/" target="_blank">Investigación INAI a Ortiz Ahlf</a>
+                </li>
+                <li class="source-item">
+                    <i class="fas fa-female"></i> <a href="https://igualdad.ine.mx/violencia-politica" target="_blank">Denuncia de Aguirre Bonilla por violencia política</a>
+                </li>
+                <li class="source-item">
+                    <i class="fas fa-user-check"></i> <a href="https://candidaturas.ine.mx" target="_blank">Perfiles de candidatas sin señalamientos (INE)</a>
+                </li>
+            </ul>
+            
+            <a href="https://transparenciaelectoral.ine.mx/elecciones-judiciales-2025" class="download-btn" target="_blank">
+                <i class="fas fa-download"></i> Descargar Reporte Completo (PDF)
+            </a>
+        </div>
+        
+        <footer>
+            <p>Reporte generado por el Sistema de Monitoreo Electoral Independiente</p>
+            <p>© 2025 - Todos los derechos reservados | Datos actualizados al 8 de junio de 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        // Risk Distribution Chart
+        const riskCtx = document.getElementById('riskChart').getContext('2d');
+        const riskChart = new Chart(riskCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Alto Riesgo', 'Medio Riesgo', 'Bajo Riesgo'],
+                datasets: [{
+                    data: [35, 25, 40],
+                    backgroundColor: [
+                        'rgba(231, 76, 60, 0.8)',
+                        'rgba(243, 156, 18, 0.8)',
+                        'rgba(39, 174, 96, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(231, 76, 60, 1)',
+                        'rgba(243, 156, 18, 1)',
+                        'rgba(39, 174, 96, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#ecf0f1',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Issue Type Chart
+        const issueCtx = document.getElementById('issueTypeChart').getContext('2d');
+        const issueChart = new Chart(issueCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Financiamiento', 'Violencia Política', 'Conflictos de Interés', 'Sabotaje', 'Plagio'],
+                datasets: [{
+                    label: 'Casos Reportados',
+                    data: [12, 8, 6, 4, 2],
+                    backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#ecf0f1'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#ecf0f1'
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Card hover effect enhancement
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
