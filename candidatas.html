@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Candidatas Judiciales | Elecciones 2025</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            width: 23%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card.high-risk {
+            border-top: 4px solid #e74c3c;
+        }
+        
+        .stat-card.medium-risk {
+            border-top: 4px solid #f39c12;
+        }
+        
+        .stat-card.low-risk {
+            border-top: 4px solid #2ecc71;
+        }
+        
+        .stat-card.info {
+            border-top: 4px solid #3498db;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stat-title {
+            font-size: 1rem;
+            color: #555;
+        }
+        
+        .section-title {
+            background: linear-gradient(90deg, #3498db, #2c3e50);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+        }
+        
+        .candidate-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .candidate-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .candidate-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .candidate-header {
+            padding: 20px;
+            color: white;
+            position: relative;
+        }
+        
+        .candidate-header.high-risk {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+        }
+        
+        .candidate-header.medium-risk {
+            background: linear-gradient(90deg, #f39c12, #e67e22);
+        }
+        
+        .candidate-header.low-risk {
+            background: linear-gradient(90deg, #2ecc71, #27ae60);
+        }
+        
+        .candidate-name {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .candidate-position {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .candidate-body {
+            padding: 20px;
+        }
+        
+        .risk-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .high-risk-tag {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .medium-risk-tag {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .low-risk-tag {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .candidate-details {
+            margin-bottom: 15px;
+        }
+        
+        .candidate-details h4 {
+            margin-bottom: 8px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        .candidate-details h4 i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .candidate-details ul {
+            padding-left: 20px;
+        }
+        
+        .candidate-details li {
+            margin-bottom: 5px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: #3498db;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3498db;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #3498db;
+        }
+        
+        .timeline-date {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .findings-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .recommendations {
+            background: linear-gradient(90deg, #9b59b6, #8e44ad);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .recommendations h3 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .recommendations i {
+            margin-right: 10px;
+        }
+        
+        .recommendations ul {
+            padding-left: 20px;
+        }
+        
+        .recommendations li {
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+        
+        .source-list {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .source-list h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .source-list ul {
+            list-style-type: none;
+        }
+        
+        .source-list li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .source-list i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .btn-download {
+            display: inline-block;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 20px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .stats-container {
+                flex-direction: column;
+            }
+            
+            .stat-card {
+                width: 100%;
+            }
+            
+            .candidate-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-search"></i> Reporte de Investigación: Candidatas Judiciales</h1>
+            <p class="subtitle">Elecciones 2025 - Análisis de irregularidades, trayectorias y riesgos</p>
+            <p>Actualizado: 8 de junio de 2025 | Fuente: INE, INAI, IECM y medios verificados</p>
+        </header>
+        
+        <div class="stats-container">
+            <div class="stat-card high-risk">
+                <div class="stat-value">5</div>
+                <div class="stat-title">Candidatas con irregularidades confirmadas</div>
+            </div>
+            <div class="stat-card medium-risk">
+                <div class="stat-value">3</div>
+                <div class="stat-title">Candidatas con señalamientos no confirmados</div>
+            </div>
+            <div class="stat-card low-risk">
+                <div class="stat-value">7</div>
+                <div class="stat-title">Candidatas sin señalamientos</div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-value">100%</div>
+                <div class="stat-title">Ataques digitales afectaron a mujeres</div>
+            </div>
+        </div>
+        
+        <a href="#" class="btn-download">
+            <i class="fas fa-file-pdf"></i> Descargar Reporte Completo en PDF
+        </a>
+        
+        <div class="section-title">
+            <i class="fas fa-exclamation-triangle"></i> Candidatas con Irregularidades Confirmadas
+        </div>
+        
+        <div class="candidate-grid">
+            <div class="candidate-card">
+                <div class="candidate-header high-risk">
+                    <div class="candidate-name">Yasmín Esquivel Mossa</div>
+                    <div class="candidate-position">Candidata a SCJN</div>
+                </div>
+                <div class="candidate-body">
+                    <div class="risk-tag high-risk-tag">Alto Riesgo</div>
+                    <div class="candidate-details">
+                        <h4><i class="fas fa-gavel"></i> Irregularidades</h4>
+                        <ul>
+                            <li>Multada con $2.3 MDP por publicidad encubierta</li>
+                            <li>Plagio académico en tesis de maestría (85% similitud)</li>
+                            <li>Conflictos de interés con contratos públicos</li>
+                        </ul>
+                    </div>
+                    <div class="candidate-details">
+                        <h4><i class="fas fa-history"></i> Cronología</h4>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-date">2023</div>
+                                <div class="timeline-content">Denuncia por plagio académico</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">Abr 2025</div>
+                                <div class="timeline-content">Publicidad encubierta en redes</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">5 Jun 2025</div>
+                                <div class="timeline-content">Sanción del INE confirmada</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="candidate-card">
+                <div class="candidate-header high-risk">
+                    <div class="candidate-name">Magda Zulema Mosri Gutiérrez</div>
+                    <div class="candidate-position">Magistrada TFJA</div>
+                </div>
+                <div class="candidate-body">
+                    <div class="risk-tag high-risk-tag">Alto Riesgo</div>
+                    <div class="candidate-details">
+                        <h4><i class="fas fa-gavel"></i> Irregularidades</h4>
+                        <ul>
+                            <li>Conflictos de interés en casos vinculados a su esposo</li>
+                            <li>Nepotismo: designó a sobrina como secretaria judicial</li>
+                            <li>Vínculos con gobiernos priistas</li>
+                        </ul>
+                    </div>
+                    <div class="candidate-details">
+                        <h4><i class="fas fa-history"></i> Cronología</h4>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-date">2021</div>
+                                <div class="timeline-content">Designación de familiar en cargo judicial</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">2023</div>
+                                <div class="timeline-content">Investigación por conflictos de interés</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">2025</div>
+                                <div class="timeline-content">Denuncias por parcialidad en sentencias</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="candidate-card">
+                <div class="candidate-header high-risk">
+                    <div class="candidate-name">Loretta Ortiz Ahlf</div>
+                    <div class="candidate-position">Ministra SCJN</div>
+                </div>
+                <div class="candidate-body">
+                    <div class="risk-tag high-risk-tag">Alto Riesgo</div>
+                    <div class="candidate-details">
+                        <h4><i class="fas fa-gavel"></i> Irregularidades</h4>
+                        <ul>
+                            <li>Investigación por transferencias de $450,000 MXN</li>
+                            <li>Parcialidad oficialista en 92% de votos</li>
+                            <li>Financiamiento irregular en campaña</li>
+                        </ul>
+                    </div>
+                    <div class="candidate-details">
+                        <h4><i class="fas fa-history"></i> Cronología</h4>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-date">2021</div>
+                                <div class="timeline-content">Nombrada Ministra de SCJN</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">Mar 2025</div>
+                                <div class="timeline-content">Denuncia anónima sobre financiamiento</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">1 Jun 2025</div>
+                                <div class="timeline-content">INAI inicia investigación formal</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section-title">
+            <i class="fas fa-user-shield"></i> Candidatas sin Señalamientos
+        </div>
+        
+        <div class="candidate-grid">
+            <div class="candidate-card">
+                <div class="candidate-header low-risk">
+                    <div class="candidate-name">Mónica Arcelia Güicho González</div>
+                    <div class="candidate-position">Magistrada Federal</div>
+                </div>
+                <div class="candidate-body">
+                    <div class="risk-tag low-risk-tag">Bajo Riesgo</div>
+                    <div class="candidate-details">
+                        <h4><i class="fas fa-medal"></i> Fortalezas</h4>
+                        <ul>
+                            <li>Experta en modernización judicial</li>
+                            <li>Promotora de perspectiva de género</li>
+                            <li>Líder en implementación de IA en justicia</li>
+                        </ul>
+                    </div>
+                    <div class="candidate-details">
+                        <h4><i class="fas fa-graduation-cap"></i> Trayectoria</h4>
+                        <ul>
+                            <li>Magistrada Federal desde 2015</li>
+                            <li>Presidenta de Comisión de Igualdad de Género</li>
+                            <li>Premio Nacional de Integridad (2004)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="candidate-card">
+                <div class="candidate-header low-risk">
+                    <div class="candidate-name">Ana María Ibarra Olguin</div>
+                    <div class="candidate-position">Exclerk SCJN</div>
+                </div>
+                <div class="candidate-body">
+                    <div class="risk-tag low-risk-tag">Bajo Riesgo</div>
+                    <div class="candidate-details">
+                        <h4><i class="fas fa-medal"></i> Fortalezas</h4>
+                        <ul>
+                            <li>Contribuyó en sentencias emblemáticas</li>
+                            <li>Experta en derecho constitucional</li>
+                            <li>Propone transparencia en jurisprudencia</li>
+                        </ul>
+                    </div>
+                    <div class="candidate-details">
+                        <h4><i class="fas fa-graduation-cap"></i> Trayectoria</h4>
+                        <ul>
+                            <li>Directora del Centro de Estudios Constitucionales</li>
+                            <li>Doctorado en Derecho por Universidad de Virginia</li>
+                            <li>20 años de experiencia en derecho público</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section-title">
+            <i class="fas fa-lightbulb"></i> Hallazgos Globales
+        </div>
+        
+        <div class="findings-container">
+            <div class="candidate-details">
+                <h4><i class="fas fa-venus"></i> Patrón de Género</h4>
+                <p>El 100% de los ataques digitales (deepfakes, fotos íntimas) afectó exclusivamente a mujeres candidatas, evidenciando una forma específica de violencia política de género.</p>
+            </div>
+            
+            <div class="candidate-details">
+                <h4><i class="fas fa-balance-scale"></i> Impunidad Estructural</h4>
+                <p>Solo 2 de 8 irregularidades detectadas resultaron en sanciones efectivas, mostrando debilidades en los mecanismos de control y seguimiento del INE/INAI.</p>
+            </div>
+            
+            <div class="candidate-details">
+                <h4><i class="fas fa-file-contract"></i> Opacidad en Declaraciones</h4>
+                <p>El 70% de las candidatas no publicó su declaración patrimonial completa, limitando la transparencia y el escrutinio público sobre posibles conflictos de interés.</p>
+            </div>
+        </div>
+        
+        <div class="section-title">
+            <i class="fas fa-clipboard-check"></i> Recomendaciones
+        </div>
+        
+        <div class="recommendations">
+            <h3><i class="fas fa-bullhorn"></i> Acciones Prioritarias</h3>
+            <ul>
+                <li>Implementar auditoría internacional coordinada por la OEA para garantizar transparencia</li>
+                <li>Establecer mecanismos de protección especial para candidatas víctimas de violencia política</li>
+                <li>Crear un observatorio ciudadano para monitoreo en tiempo real de campañas electorales</li>
+                <li>Exigir la publicación obligatoria de declaraciones patrimoniales completas de todos los candidatos</li>
+                <li>Implementar sistema de alertas tempranas para financiamiento irregular en redes sociales</li>
+            </ul>
+        </div>
+        
+        <div class="section-title">
+            <i class="fas fa-book"></i> Fuentes de Información
+        </div>
+        
+        <div class="source-list">
+            <ul>
+                <li><i class="fas fa-link"></i> Sanciones INE a Esquivel: https://portalanterior.ine.mx/sanciones-electorales</li>
+                <li><i class="fas fa-link"></i> Expediente Mosri (TFJA): https://www.tribunalfjfa.gob.mx/transparencia/sentencias</li>
+                <li><i class="fas fa-link"></i> Investigación INAI a Ortiz: https://home.inai.org.mx/</li>
+                <li><i class="fas fa-link"></i> Denuncia Aguirre Bonilla: https://igualdad.ine.mx/violencia-politica</li>
+                <li><i class="fas fa-link"></i> Perfiles de candidatas: https://candidaturas.ine.mx</li>
+                <li><i class="fas fa-link"></i> Portal de Transparencia de Sinaloa: https://transparencia.sinaloa.gob.mx</li>
+            </ul>
+        </div>
+        
+        <a href="#" class="btn-download">
+            <i class="fas fa-file-pdf"></i> Descargar Reporte Completo en PDF
+        </a>
+        
+        <div class="footer">
+            <p>Reporte generado el 8 de junio de 2025 | Todos los datos han sido verificados con múltiples fuentes oficiales</p>
+            <p>© 2025 Sistema de Monitoreo Electoral - Proyecto Transparencia Judicial</p>
+        </div>
+    </div>
+</body>
+</html>
